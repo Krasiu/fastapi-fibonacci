@@ -1,0 +1,6 @@
+fastapi
+celery
+sqlalchemy
+uvicorn
+pytest
+requests

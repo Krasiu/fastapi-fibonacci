@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    command: uvicorn app.api.main:app --host 0.0.0.0 --port 8000 --workers 4
+    volumes:
+      - .:/application
+    ports:
+      - '8000:8000'
+    depends_on:
+      - celery
+      - rabbitmq
+
+  rabbitmq:
+    image: 'bitnami/rabbitmq:3.8'
+    ports:
+      - '4369:4369'
+      - '5672:5672'
+      - '25672:25672'
+      - '15672:15672'
+    volumes:
+      - 'rabbitmq_data:/bitnami'
+
+  celery:
+    build:
+      context: ./app/tasks
+    command: celery -A app.tasks worker -l info
+    volumes:
+      - .:/application
+    depends_on:
+      - rabbitmq
+volumes:
+  rabbitmq_data:
+    driver: local
